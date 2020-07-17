@@ -11,7 +11,13 @@ const {Meta} = Card
 export function DailyCard () {
   const [pic, setPic] = useState([])
   const [init, setInit] = useState(true)
+  const [span, setSpan] = useState(4)
+
   if (init){
+    let isMobile = /Android|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)
+    if (isMobile) {
+      setSpan(24)
+    }
     getWeeklyTop()
       .then(resp=>{
         console.log(resp.illusts)
@@ -57,7 +63,7 @@ export function DailyCard () {
     console.log(pic)
     pic.forEach(data=>{
     cols.push(
-      <Col span={4} key={data.key}
+      <Col span={span} key={data.key}
            style={{ height:"auto", display:"inline"}}
       >
       <Card
@@ -77,7 +83,6 @@ export function DailyCard () {
             console.log(url)
             link.href = url
             link.target = "_blank"
-            link.download = "111.png"
             link.click()
           }}/>,
         ]}

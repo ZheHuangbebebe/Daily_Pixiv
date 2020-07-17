@@ -8,8 +8,13 @@ import "./Layout.css"
 
 const { Content, Sider } = Layout;
 
+
 export const PageLayout = () => {
   const [collapsed, onCollapse] = useState(false)
+  let isMobile = /Android|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)
+  if (isMobile) {
+    return <DailyCard/>
+  }
   function handleClick(e){
     console.log('click ', e);
   };
