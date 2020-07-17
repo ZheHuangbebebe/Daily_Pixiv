@@ -3,7 +3,8 @@ import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 import { PageHeader, Tag, Button, Statistic, Descriptions, Row, Col, Carousel, Card, Divider, Pagination, Table, Space, Popover } from 'antd';
 import { LeftOutlined, RightOutlined, EditOutlined, EllipsisOutlined, SettingOutlined, DownloadOutlined, TagsOutlined, FullscreenOutlined } from "@ant-design/icons"
 import QueueAnim from 'rc-queue-anim';
-import { getWeeklyTop } from "./getWeeklyTop";
+import { getDailyTop } from "./getDailyTop";
+import { getIllustByMember } from "./getIllustByMember"
 import "./dailyTop.css";
 
 const {Meta} = Card
@@ -12,13 +13,21 @@ export function DailyCard () {
   const [pic, setPic] = useState([])
   const [init, setInit] = useState(true)
   const [span, setSpan] = useState(4)
+  const [page, setPage] = useState(1)
 
   if (init){
     let isMobile = /Android|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)
     if (isMobile) {
       setSpan(24)
     }
-    getWeeklyTop()
+    renderPic(1)
+    setInit(false)
+  }
+  console.log(pic)
+
+  function renderPic(page){
+    setPage(page)
+    getDailyTop(page)
       .then(resp=>{
         console.log(resp.illusts)
         let picList = resp.illusts
@@ -28,9 +37,7 @@ export function DailyCard () {
         }
         setPic(picList)
       })
-    setInit(false)
   }
-  console.log(pic)
 
   const DailyTopPageHeader = () => {
     return (
@@ -106,6 +113,10 @@ export function DailyCard () {
         style={{background:"white",margin:"12px", padding:"12px"}}
       >
         <PicCards/>
+        <Pagination style={{textAlign:"center"}} current={page} showSizeChanger={false} total={500} defaultPageSize={30} onChange={(p)=>{
+          console.log(p)
+          renderPic(p)
+        }}/>
       </div>
     )
   }

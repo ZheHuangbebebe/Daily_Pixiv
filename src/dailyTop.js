@@ -3,14 +3,14 @@ import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 import { PageHeader, Tag, Button, Statistic, Descriptions, Row, Col, Carousel, Card, Divider, Pagination, Table, Space, Popover } from 'antd';
 import { LeftOutlined, RightOutlined, EditOutlined, EllipsisOutlined, SettingOutlined } from "@ant-design/icons"
 import QueueAnim from 'rc-queue-anim';
-import { getWeeklyTop } from "./getWeeklyTop";
+import { getDailyTop } from "./getDailyTop";
 import "./dailyTop.css";
 
 export function DailyTop () {
   const [pic, setPic] = useState([])
   const [init, setInit] = useState(true)
   if (init){
-    getWeeklyTop()
+    getDailyTop()
       .then(resp=>{
         console.log(resp.illusts)
         let picList = resp.illusts
