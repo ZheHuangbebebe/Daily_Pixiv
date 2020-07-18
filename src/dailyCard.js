@@ -1,61 +1,91 @@
 import React, {useState} from "react"
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
-import { PageHeader, Tag, Button, Statistic, Descriptions, Row, Col, Carousel, Card, Divider, Pagination, Table, Space, Popover } from 'antd';
-import { LeftOutlined, RightOutlined, EditOutlined, EllipsisOutlined, SettingOutlined, DownloadOutlined, TagsOutlined, FullscreenOutlined } from "@ant-design/icons"
-import QueueAnim from 'rc-queue-anim';
-import { getDailyTop } from "./getDailyTop";
-import { getIllustByMember } from "./getIllustByMember"
+import { PageHeader, Tag, Button, Statistic, Switch, Row, Col, Carousel, Card, Divider, Pagination, Table, Space, Popover, Avatar, Select, Dropdown, Menu } from 'antd';
+import { LeftOutlined, RightOutlined, EditOutlined, EllipsisOutlined, SettingOutlined, DownloadOutlined, TagsOutlined, FullscreenOutlined, ExpandAltOutlined, MoreOutlined } from "@ant-design/icons"
+import { getTop } from "./getTop";
+import Layout from "./Layout"
 import "./dailyTop.css";
+import {getIllustByMember} from "./getIllustByMember";
+import {getIllustBySearchTag} from "./getIllustBySearchTag";
 
 const {Meta} = Card
+const { Option } = Select;
 
-export function DailyCard () {
+export function DailyCard (props) {
+  console.log(window.innerWidth)
+  let params = {}
+  if(props.hasOwnProperty("params")){
+    params = props.params
+  }
+  const num = window.innerWidth>=1500?4:window.innerWidth<=1000?12:6
+  const [mode, setMode] = useState("day")
+  const [checked, setChecked] = useState(true)
+  const [total, setTotal] = useState(500)
   const [pic, setPic] = useState([])
   const [init, setInit] = useState(true)
-  const [span, setSpan] = useState(4)
+  const [span, setSpan] = useState(num)
   const [page, setPage] = useState(1)
-
+  const isMobile = /Android|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)
+  window.addEventListener('resize', ()=>{
+    setSpan(window.innerWidth>=1500?4:window.innerWidth<=1000?12:6)
+  });
   if (init){
-    let isMobile = /Android|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)
     if (isMobile) {
       setSpan(24)
     }
-    renderPic(1)
+    renderPic(1, mode)
     setInit(false)
   }
-  console.log(pic)
-
-  function renderPic(page){
+  function renderPic(page, mode){
     setPage(page)
-    getDailyTop(page)
+    if(params.hasOwnProperty("member")){
+      getIllustByMember(props.params.member, page)
       .then(resp=>{
-        console.log(resp.illusts)
         let picList = resp.illusts
         for (let i=0;i<picList.length;i++){
           picList[i]["key"] = picList[i]["id"]
-
         }
         setPic(picList)
       })
+      console.log("span: ",span)
+    }
+    else if(params.hasOwnProperty("tag")){
+      getIllustBySearchTag(props.params.tag, page)
+      .then(resp=>{
+        let picList = resp.illusts
+        let spanDict = {}
+        for (let i=0;i<picList.length;i++){
+          picList[i]["key"] = picList[i]["id"]
+        }
+        setPic(picList)
+      })
+    }
+    else{
+      getTop(mode, page)
+      .then(resp=>{
+        console.log(resp.illusts)
+        let picList = resp.illusts
+        let spanDict = {}
+        for (let i=0;i<picList.length;i++){
+          picList[i]["key"] = picList[i]["id"]
+        }
+        setPic(picList)
+      })
+    }
+
   }
 
-  const DailyTopPageHeader = () => {
-    return (
-      <PageHeader
-        title="每日热门"
-        style={{background:"white", margin:"12px"}}
-      >
-      </PageHeader>
-    )
-  }
 
   const TagsPopover = (props) => {
     const tags = props.tags
     return(
-      <Popover overlayStyle={{maxWidth:"300px"}} content={tags.map(tag => {
-        let color =  'geekblue';
+      <Popover overlayStyle={{maxWidth:"400px"}} content={tags.map(tag => {
+        let colors = ['blue','geekblue', 'magenta', 'lime', 'green', 'cyan', 'purple', 'gold', 'orange'];
+        let color = colors[Math.floor(0.5+Math.random()*colors.length)]
         return (
-          <Tag color={color} key={tag}>
+          <Tag style={{cursor:"pointer"}} draggable color={color} key={tag} onClick={()=>{
+            window.location.pathname="/tag/"+tag.name
+          }}>
             {tag.name}
           </Tag>
         );
@@ -65,20 +95,35 @@ export function DailyCard () {
     )
   }
 
-  const PicCards = () => {
-    const cols = []
-    console.log(pic)
-    pic.forEach(data=>{
-    cols.push(
-      <Col span={span} key={data.key}
-           style={{ height:"auto", display:"inline"}}
-      >
+  function SingleCard(props){
+    const [size, setSize] = useState("medium")
+    const data = props.data
+    return (
+      <>
+        {/*{size}*/}
       <Card
         hoverable
-        cover={<img alt="example" src={data.image_urls.medium.replace("pximg.net", "pixiv.cat")} />}
+        id={`card_${data.key}`}
+        bodyStyle={{padding:0}}
+        cover={<Popover
+          content={<><Avatar src={data.user.profile_image_urls.medium.replace("pximg.net", "pixiv.cat")}/> <a onClick={()=>{
+            window.location.pathname="/member/"+data.user.id
+          }}
+          >{data.user.name}</a></>}
+          title={<>{data.title}</>}
+        ><img alt="example" src={data.image_urls[size].replace("pximg.net", "pixiv.cat")} /></Popover>}
         actions={[
           <TagsPopover tags={data.tags}/>,
-          <FullscreenOutlined key="downloads" onClick={()=>{
+          <Dropdown overlay={
+            <Menu>
+              <Menu.Item key="1" onClick={()=>{setSize("medium")}}>普通</Menu.Item>
+              <Menu.Item key="2" onClick={()=>{setSize("large")}}>高清</Menu.Item>
+
+            </Menu>
+          } placement="bottomCenter">
+            <MoreOutlined/>
+          </Dropdown>,
+          <Popover content="原图预览"><FullscreenOutlined key="downloads" onClick={()=>{
             let link = document.createElement("a")
             let url = ""
             if (data.meta_pages.length === 0){
@@ -91,11 +136,20 @@ export function DailyCard () {
             link.href = url
             link.target = "_blank"
             link.click()
-          }}/>,
+          }}/></Popover>,
         ]}
+      /></>
+    )
+  }
+
+  function PicCards(){
+    const cols = []
+    pic.forEach(data=>{
+    cols.push(
+      <Col span={span} key={data.key}
+           style={{ height:"auto", display:"inline"}}
       >
-          <Meta title={data.title} description={<a>{data.user.name}</a>} />
-      </Card>
+      <SingleCard data={data}/>
       </Col>
 
     )
@@ -112,17 +166,66 @@ export function DailyCard () {
       <div
         style={{background:"white",margin:"12px", padding:"12px"}}
       >
+        <div style={{marginBottom:24}}>
+        {Object.keys(params).length === 0?<RankButton/>:<></>}
+        <PicSize/>
+        </div>
         <PicCards/>
-        <Pagination style={{textAlign:"center"}} current={page} showSizeChanger={false} total={500} defaultPageSize={30} onChange={(p)=>{
+        <Pagination style={{textAlign:"center"}} current={page} showSizeChanger={false} total={total} defaultPageSize={30} onChange={(p)=>{
           console.log(p)
           renderPic(p)
         }}/>
       </div>
     )
   }
+
+  // const Title = (props) => {
+  //   return (
+  //     <PageHeader title={props.content} style={{background:"white",margin:"12px", padding:"12px"}}/>
+  //     )
+  // }
+
+  const PicSize = () => {
+    return (
+      <>
+      <h3 style={{display:"inline", marginRight:12, marginTop:"12px"}}>尺寸:</h3>
+      <Switch
+        checked={checked}
+        checkedChildren="标准"
+        unCheckedChildren="原图"
+        onChange={(checked)=>{
+          console.log(checked)
+          setChecked(checked)
+          setSpan(checked?num:0)
+        }}
+      />
+      </>
+    )
+  }
+
+  const RankButton = () => {
+    return(
+      <div style={{ display:"inline"}}>
+        <h2 style={{display:"inline"}}><b>排行榜: </b></h2>
+      <Select size="large"defaultValue={mode} style={{ width: 120 }} bordered={false} onChange={(v)=>{
+        setMode(v)
+        console.log(v)
+        renderPic(1, v)
+      }}>
+        <Option value="day">日榜</Option>
+        <Option value="week" >周榜</Option>
+        <Option value="month">月榜</Option>
+        <Option value="week_rookie">新人榜</Option>
+        <Option value="week_original">原创榜</Option>
+        <Option value="day_male">男性向</Option>
+        <Option value="day_female">女性向</Option>
+      </Select>
+      </div>
+    )
+  }
   return (
     <>
-      <DailyTopPageHeader/>
+      {/*{Object.keys(params).length === 0?<></>:params.member!==undefined?<Title content={params.member}/>:<Title content={params.tag}/>}*/}
       <DailyTopContent/>
     </>
   )

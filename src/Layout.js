@@ -1,16 +1,16 @@
 import React, {useState} from "react"
 import 'antd/dist/antd.css';
 import { Menu, Layout } from 'antd';
-import { DailyTop } from "./dailyTop"
 import { DailyCard } from "./dailyCard"
 import "./Layout.css"
-// import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
 
 const { Content, Sider } = Layout;
 
 
-export const PageLayout = () => {
+export const PageLayout = (props) => {
   const [collapsed, onCollapse] = useState(false)
+  const member = props.match.params.member
+  const tag = props.match.params.tag
   let isMobile = /Android|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)
   if (isMobile) {
     return <DailyCard/>
@@ -37,7 +37,9 @@ export const PageLayout = () => {
         {/*<Menu.Item key="4">Tab 4</Menu.Item>*/}
       </Menu>
     </Sider>
-    <Content><DailyCard/></Content>
+    <Content>
+      <DailyCard params={props.match.params}/>
+    </Content>
     </Layout>
   )
 }
