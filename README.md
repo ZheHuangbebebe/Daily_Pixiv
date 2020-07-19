@@ -2,7 +2,7 @@
 
 **使用React和Ant Design写的一个前端UI**  
 
-**基于该[API](https://api.imjad.cn/pixiv_v2.md)获取数据**  
+**基于该[API](https://api.imjad.cn/pixiv_v2.md)，可以不用VPN获取数据**  
 
 ```
 npm install
