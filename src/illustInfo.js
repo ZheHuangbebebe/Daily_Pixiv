@@ -2,10 +2,6 @@ import React, {useState} from "react"
 import {PageHeader, Button, Descriptions, Avatar, Popover, Tag, Card, Dropdown, Menu, Col, Row} from "antd";
 import {TagsOutlined, MoreOutlined} from "@ant-design/icons"
 import {getRelatedIllust} from "./getRelatedIllust";
-import WindowScroller from 'react-virtualized/dist/commonjs/WindowScroller';
-import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
-import VList from 'react-virtualized/dist/commonjs/List';
-import InfiniteLoader from 'react-virtualized/dist/commonjs/InfiniteLoader';
 
 export function IllustInfo(props){
   const data = props.data
