@@ -1,8 +1,8 @@
 ## Pixiv排行榜
 
-**使用React和Ant Design写的一个前端UI**  
+**使用React和Ant Design写的一个前端UI，相当于不用VPN访问Pixiv**  
 
-**基于该[API](https://api.imjad.cn/pixiv_v2.md)，可以不用VPN获取数据**  
+**基于该[API](https://api.imjad.cn/pixiv_v2.md)获取数据**  
 
 ```
 npm install
