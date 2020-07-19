@@ -2,12 +2,17 @@
 
 **使用React和Ant Design写的一个前端UI**  
 
-**基于该[API](https://api.imjad.cn/pixiv_v2.md)获取数据**
+**基于该[API](https://api.imjad.cn/pixiv_v2.md)获取数据**  
 
 ```
 npm install
 npm start
 ```
+* 查看每日/周/月/新人/原创/男性/女性排行榜
+* 根据作者/标签进行检索
+* 查看单个作品信息及原图，并关联其相关作品
+
+
 
 ### 预览图
 #### 排行榜
