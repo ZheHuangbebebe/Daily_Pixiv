@@ -4,7 +4,7 @@
 **基于该[API](https://api.imjad.cn/pixiv_v2.md)**
 
 ### 预览图
-
+![](/img/full.png)
 
 运行代码: 
 ```
