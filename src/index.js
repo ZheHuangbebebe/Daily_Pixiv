@@ -15,6 +15,7 @@ class App extends React.Component{
       <Router>
         <Route exact path="/member/:member" component={PageLayout}/>
         <Route exact path="/tag/:tag" component={PageLayout}/>
+        <Route exact path="/illust/:illust" component={PageLayout}/>
         <Route exact path="/" component={PageLayout}/>
       </Router>
 

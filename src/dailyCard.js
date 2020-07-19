@@ -7,12 +7,14 @@ import Layout from "./Layout"
 import "./dailyTop.css";
 import {getIllustByMember} from "./getIllustByMember";
 import {getIllustBySearchTag} from "./getIllustBySearchTag";
+import {IllustInfo} from "./illustInfo"
+import {getRelatedIllust} from "./getRelatedIllust"
 
 const {Meta} = Card
 const { Option } = Select;
 
 export function DailyCard (props) {
-  console.log(window.innerWidth)
+  console.log(window.location)
   let params = {}
   if(props.hasOwnProperty("params")){
     params = props.params
@@ -20,11 +22,11 @@ export function DailyCard (props) {
   const num = window.innerWidth>=1500?4:window.innerWidth<=1000?12:6
   const [mode, setMode] = useState("day")
   const [checked, setChecked] = useState(true)
-  const [total, setTotal] = useState(500)
   const [pic, setPic] = useState([])
   const [init, setInit] = useState(true)
   const [span, setSpan] = useState(num)
   const [page, setPage] = useState(1)
+  const [illust, setIllust] = useState()
   const isMobile = /Android|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)
   window.addEventListener('resize', ()=>{
     setSpan(window.innerWidth>=1500?4:window.innerWidth<=1000?12:6)
@@ -84,7 +86,7 @@ export function DailyCard (props) {
         let color = colors[Math.floor(0.5+Math.random()*colors.length)]
         return (
           <Tag style={{cursor:"pointer"}} draggable color={color} key={tag} onClick={()=>{
-            window.location.pathname="/tag/"+tag.name
+            window.open(window.location.origin+"/tag/"+tag.name,'_blank')
           }}>
             {tag.name}
           </Tag>
@@ -106,12 +108,13 @@ export function DailyCard (props) {
         id={`card_${data.key}`}
         bodyStyle={{padding:0}}
         cover={<Popover
-          content={<><Avatar src={data.user.profile_image_urls.medium.replace("pximg.net", "pixiv.cat")}/> <a onClick={()=>{
-            window.location.pathname="/member/"+data.user.id
+          content={<div><Avatar src={data.user.profile_image_urls.medium.replace("pximg.net", "pixiv.cat")}/> <a onClick={()=>{
+            window.open(window.location.origin+"/member/"+data.user.id,'_blank')
+
           }}
-          >{data.user.name}</a></>}
-          title={<>{data.title}</>}
-        ><img alt="example" src={data.image_urls[size].replace("pximg.net", "pixiv.cat")} /></Popover>}
+          >{data.user.name}</a></div>}
+          title={<div style={{padding:12}}>{data.title}</div>}
+        ><img onClick={()=>{setIllust(data)}} alt="example" src={data.image_urls[size].replace("pximg.net", "pixiv.cat")} /></Popover>}
         actions={[
           <TagsPopover tags={data.tags}/>,
           <Dropdown overlay={
@@ -123,20 +126,20 @@ export function DailyCard (props) {
           } placement="bottomCenter">
             <MoreOutlined/>
           </Dropdown>,
-          <Popover content="原图预览"><FullscreenOutlined key="downloads" onClick={()=>{
-            let link = document.createElement("a")
-            let url = ""
-            if (data.meta_pages.length === 0){
-              url = data.meta_single_page.original_image_url.replace("pximg.net", "pixiv.cat")
-            }
-            else{
-              url = data.meta_pages[0].image_urls.original.replace("pximg.net", "pixiv.cat")
-            }
-            console.log(url)
-            link.href = url
-            link.target = "_blank"
-            link.click()
-          }}/></Popover>,
+          // <Popover content="原图预览"><FullscreenOutlined key="downloads" onClick={()=>{
+          //   let link = document.createElement("a")
+          //   let url = ""
+          //   if (data.meta_pages.length === 0){
+          //     url = data.meta_single_page.original_image_url.replace("pximg.net", "pixiv.cat")
+          //   }
+          //   else{
+          //     url = data.meta_pages[0].image_urls.original.replace("pximg.net", "pixiv.cat")
+          //   }
+          //   console.log(url)
+          //   link.href = url
+          //   link.target = "_blank"
+          //   link.click()
+          // }}/></Popover>,
         ]}
       /></>
     )
@@ -171,7 +174,7 @@ export function DailyCard (props) {
         <PicSize/>
         </div>
         <PicCards/>
-        <Pagination style={{textAlign:"center"}} current={page} showSizeChanger={false} total={total} defaultPageSize={30} onChange={(p)=>{
+        <Pagination style={{textAlign:"center"}} current={page} showSizeChanger={false} total={600} defaultPageSize={30} onChange={(p)=>{
           console.log(p)
           renderPic(p)
         }}/>
@@ -223,10 +226,14 @@ export function DailyCard (props) {
       </div>
     )
   }
+
   return (
     <>
       {/*{Object.keys(params).length === 0?<></>:params.member!==undefined?<Title content={params.member}/>:<Title content={params.tag}/>}*/}
-      <DailyTopContent/>
+      {illust === undefined?
+        <DailyTopContent/>:
+        <IllustInfo data={illust} back={setIllust}/>
+      }
     </>
   )
 }

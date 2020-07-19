@@ -31,7 +31,7 @@ export const PageLayout = (props) => {
       defaultOpenKeys={['sub1']}
       mode="inline"
       >
-        <Menu.Item key="1">每周TOP(卡片)</Menu.Item>
+        <Menu.Item key="1">排行榜</Menu.Item>
         {/*<Menu.Item key="2">每周TOP(表格)</Menu.Item>*/}
         {/*<Menu.Item key="3">Tab 3</Menu.Item>*/}
         {/*<Menu.Item key="4">Tab 4</Menu.Item>*/}
